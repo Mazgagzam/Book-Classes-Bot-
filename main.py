@@ -22,23 +22,13 @@ def save():
 
   global people2
 
-  f=open('bd_people.py','w+')
-
-  f.write('people2='+str(people2))
-
-  f.close()
-
-  
+  with open('bd_people.py','w+') as f:
+    f.write(f'people2={str(people2)}')
 
   global people
 
-  #people[2028784660]['class']['people']=[t for t in people2 if t!=0]
-
-  f=open('bd_people2.py','w+')
-
-  f.write('from bd_people import people2\npeople='+str(people))
-
-  f.close()
+  with open('bd_people2.py','w+') as f:
+    f.write('from bd_people import people2\npeople='+str(people))
 
 def new_people(message):
 
@@ -65,18 +55,18 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
 @dp.message_handler(content_types=types.ContentTypes.PHOTO)
-
 async def send_to_admin(message: types.Message):
 
   print('PHOTO',message.from_user.first_name  )
 
-  
+
 
   #await bot.send_message(message.chat.id,'<span class="tg-spoiler">spoiler</span>',parse_mode="html")
 
   #await bot.send_photo(chat_id=2028784660, photo=message.photo[-1].file_id)
 
-  if people[message.from_user.id]['action'][0] != None and people[message.from_user.id]['action'][0][0:10] == 'edit_photo':
+  if (people[message.from_user.id]['action'][0] != None
+      and people[message.from_user.id]['action'][0][:10] == 'edit_photo'):
 
     await message.photo[-1].download(destination_file=f'{people[message.from_user.id]["action"][0].split("_")[-1]}.jpg')
 
@@ -89,12 +79,11 @@ async def send_to_admin(message: types.Message):
   save()
 
 @dp.message_handler(lambda msg: msg.from_user.id==2028784660 and "/see" in msg.text)
-
 async def see(message):
 
   global people,people2
 
-  if message.text[0:6]=="/see_3":
+  if message.text[:6] == "/see_3":
 
     await bot.send_message(int(message.text.split("_")[2]), message.text.split("_")[3])
 
@@ -106,19 +95,15 @@ async def see(message):
 
     for t in people2:
 
-      if True:
+      a+=str(t)+" {"
 
-         a+=str(t)+" {"
+      try:
 
-         try:
+          a+=f"\n    Photo: {str(people2[t][0])}\n    BIO: {str(people2[t][1])}\n    Name: {str(people2[t][2])}"
 
-             a+=f"\n    Photo: {str(people2[t][0])}\n    BIO: {str(people2[t][1])}\n    Name: {str(people2[t][2])}"
+      except: a+=str(people2 [t])
 
-         except: a+=str(people2 [t])
-
-         a+="\n}\n\n"
-
-      else: pass
+      a+="\n}\n\n"
 
     await bot.send_message(message.chat.id,a)
 
@@ -132,25 +117,25 @@ async def see(message):
 
       try:
 
-       for y in people[t]:
+        for y in people[t]:
 
           if type(people[t][y])==dict:
 
-           b='  class {\n'
+            b='  class {\n'
 
-           for j in people[t][y]:
+            for j in people[t][y]:
 
-              b+='    '+j+' : '+str(people[t][y][j])+'\n'
+              b += f'    {j} : {str(people[t][y][j])}' + '\n'
 
-           b+='  }\n'
+            b+='  }\n'
 
           else:
 
-           b='  '+y+' : '+str(people[t][y])+'\n'
+            b = f'  {y} : {str(people[t][y])}' + '\n'
 
           a+=b
 
-       
+
 
       except Exception as e:
 
